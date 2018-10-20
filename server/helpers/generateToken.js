@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-const generateToken = (id, firstName, lastName, middleName, email, role) => {
-  const token = jwt.sign({ id, firstName, lastName, middleName, email, role }, 'secretkeyhereforus');
+const generateToken = (id, firstName, lastName, middleName, email, role, title) => {
+  const token = jwt.sign({ id, firstName, lastName, middleName, email, role, title }, 'secretkeyhereforus');
   return token;
 }
 

@@ -2,10 +2,15 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import model from '../models';
 import generateToken from '../helpers/generateToken';
+import validateSignup from '../validators/validateSignup';
 
 class UserClass {
   static signup (request, response) {
-    const { email, password, role, firstName, lastName, middleName } = request.body;
+    const { errors, isValid } = validateSignup(request.body);
+    if (!isValid) {
+      return response.status(400).json(errors)
+    }
+    const { email, password, role, firstName, lastName, middleName, title } = request.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     model.User.create({
@@ -14,9 +19,10 @@ class UserClass {
       role,
       firstName,
       lastName,
-      middleName
+      middleName,
+      title
     }).then(user => {
-      const token = generateToken(user.dataValues.id, user.dataValues.firstName, user.dataValues.lastName, user.dataValues.middleName, user.dataValues.email, user.dataValues.role);
+      const token = generateToken(user.dataValues.id, user.dataValues.firstName, user.dataValues.lastName, user.dataValues.middleName, user.dataValues.email, user.dataValues.role, user.dataValues.title);
       return response.status(201).json({
         message: 'Signup successful',
         token
@@ -38,7 +44,7 @@ class UserClass {
           message: 'Passwords don\'t match'
         });
       }
-      const token = generateToken(user.dataValues.id, user.dataValues.firstName, user.dataValues.lastName, user.dataValues.middleName, user.dataValues.email, user.dataValues.role);
+      const token = generateToken(user.dataValues.id, user.dataValues.firstName, user.dataValues.lastName, user.dataValues.middleName, user.dataValues.email, user.dataValues.role, user.dataValues.title);
       return response.status(201).json({
         message: 'Successfully signed in',
         token,
